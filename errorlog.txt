@@ -1,0 +1,23 @@
+# pip install channels django opencv-python numpy mediapipe 도중 에러 발생
+
+Building wheels for collected packages: autobahn
+  Building wheel for autobahn (setup.py) ... error
+  ERROR: Command errored out with exit status 1:
+   command: /home/junsoo/signlanguage/channelsopencv/venv/bin/python3 -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/pip-install-c95xj4rn/autobahn/setup.py'"'"'; __file__='"'"'/tmp/pip-install-c95xj4rn/autobahn/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' bdist_wheel -d /tmp/pip-wheel-0hch2g1w
+       cwd: /tmp/pip-install-c95xj4rn/autobahn/
+  Complete output (8 lines):
+  /usr/lib/python3.8/distutils/dist.py:274: UserWarning: Unknown distribution option: 'cffi_modules'
+    warnings.warn(msg)
+  usage: setup.py [global_opts] cmd1 [cmd1_opts] [cmd2 [cmd2_opts] ...]
+     or: setup.py --help [cmd1 cmd2 ...]
+     or: setup.py --help-commands
+     or: setup.py cmd --help
+  
+  error: invalid command 'bdist_wheel'
+  ----------------------------------------
+  ERROR: Failed building wheel for autobahn
+
+
+
+
+
