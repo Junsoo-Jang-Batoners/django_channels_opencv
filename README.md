@@ -14,3 +14,9 @@ python manage.py migrate
 python manage.py runserver
 
 python sender.py
+
+gdrive down
+
+cd inference
+
+python -m signjoey configs/sing_dcba_inf.yaml
