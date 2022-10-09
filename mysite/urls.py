@@ -18,8 +18,14 @@ from django.conf.urls import include
 from django.urls import path
 from django.contrib import admin
 
+from chat.views import index, chatPage
+
 urlpatterns = [
-    path('chat/', include('chat.urls')),
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('', index, name='home'),
+    path('chat/<str:username>/', chatPage, name='chat'),
     path('video/', include('video.urls')),
     path('admin/', admin.site.urls),
 ]
+
+    # path('chat/', include(('chat.urls', 'chat'), namespace='chat')),

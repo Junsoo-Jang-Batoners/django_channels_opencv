@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SignLanguage{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="back-container">
+    <div class="container-fluid front-container">
+        <div class="back-top"></div>
+        <div class="back-main"></div>
+    </div>
+    <div class="container front-container1">
+        <div class="row chat-top">
+            <div class="col-sm-12">
+                <img src="{% static 'assets/dp.png' %}" alt="" class="profile-image rounded-circle">
+                <span class="ml-2">{{user.username}}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 message-area">
+                <div class="message-table-scroll">
+                    <table class="table">
+                        <tbody id='chat-body'>
+                            {% for message in messages %}
+                            {% if message.sender == request.user.username %}
+                            <tr>
+                                <td>
+                                    <p><small class="p-1 shadow-sm float-right">{{message.timestamp|time:'H:i'}}</small>
+                                    </p>
+                                    <p class="bg-success p-2 mt-2 mr-5 shadow-sm text-white float-right rounded">
+                                        {{message.message}}
+                                    </p>
+
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td>
+                                    <p><small class="p-1 shadow-sm float-left">{{message.timestamp|time:'H:i'}}</small>
+                                    </p>
+                                    <p class="bg-primary p-2 mt-2 mr-5 shadow-sm text-white float-left rounded">
+                                        {{message.message}}
+                                    </p>
+
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row message-box p-3">
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="message_input" placeholder="메시지를 입력해주세요.">
+                    </div>
+                    <div class="col-sm-2 mt-1">
+                        <div class="control">
+                            <button class="btn btn-success" id="chat-message-submit">전송</button>
+                        </div>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <td width="100%">
+                                <img src="http://127.0.0.1:8000/video_stream" style="width:200px;" />
+                            </td>
+                        </tr>                    
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div>
+    <img id="resImg" src="" />
+</div> 
+chat
+
+{{user.id|json_script:"json-username"}}
+{{request.user.username|json_script:"json-message-username"}}
+{% endblock %}
+
+
+{% block javascript %}
+<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js" ></script>
+<script>
+const id = JSON.parse(document.getElementById('json-username').textContent);
+const message_username = JSON.parse(document.getElementById('json-message-username').textContent);
+
+const socket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/'
+    + id
+    + '/'
+);
+
+socket.onopen = function(e){
+    console.log("CONNECTION ESTABLISHED");
+}
+
+socket.onclose = function(e){
+    console.log("CONNECTION LOST");
+}
+
+socket.onerror = function(e){
+    console.log("ERROR OCCURED");
+}
+
+socket.onmessage = function(e){
+    const data = JSON.parse(e.data);
+    if(data.username == message_username){
+        document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                <td>
+                                                                <p class="bg-success p-2 mt-2 mr-5 shadow-sm text-white float-right rounded">${data.message}</p>
+                                                                </td>
+                                                            </tr>`
+    }else{
+        document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                <td>
+                                                                <p class="bg-primary p-2 mt-2 mr-5 shadow-sm text-white float-left rounded">${data.message}</p>
+                                                                </td>
+                                                            </tr>`
+    }
+}
+
+document.querySelector('#chat-message-submit').onclick = function(e){
+    const message_input = document.querySelector('#message_input');
+    const message = message_input.value;
+
+    socket.send(JSON.stringify({
+        'message':message,
+        'username':message_username
+    }));
+
+    message_input.value = '';
+}
+
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + roomName
+        + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        document.querySelector('#chat-log').value += (data.message + '\n');
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message
+        }));
+        messageInputDom.value = '';
+    };
+    const ws = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/video/'
+        + 'wms'
+        + '/'
+    );
+
+    ws.onmessage = function(evt) {
+        v_data = JSON.parse(evt.data);
+        $("#resImg").attr("src", v_data.message);
+        //console.log( "Received Message: " + v_data.message);
+        // ws.close();
+    };
+
+    ws.onclose = function(evt) {
+        console.log("Connection closed.");
+    };
+</script>
+{% endblock %}
