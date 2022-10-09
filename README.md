@@ -1,5 +1,7 @@
 # installation
 
+- python >= 3.8
+
 - python -m venv venv
 
 - source venv/###/activate
