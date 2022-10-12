@@ -289,4 +289,9 @@ cython_debug/
 pyvenv.cfg
 pip-selfcheck.json
 
+### folder ###
+inference/data/DCBA
+inference/dcba01
+*.ckpt
+
 # End of https://www.toptal.com/developers/gitignore/api/python,venv,django,opencv,git
