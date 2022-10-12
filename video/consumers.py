@@ -4,9 +4,18 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 class VideoConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        # try:
+        #     if self.scope['user'].id:
+        #         print(self.scope['user'].id)
+        #         print(self.scope['user'].username)
+
+        #         print('id')
+        # except:
+        #     print('none')
+
         self.room_name = self.scope['url_route']['kwargs']['v_name']
         self.room_group_name = 'video_%s' % self.room_name
-        #print(self.room_name)
+        # print(self.room_name)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -35,7 +44,10 @@ class VideoConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def video_message(self, event):
-        # print(1)
+        # print(2)
+        # vid_cnt += 1
+        # if not vid_cnt % 100:
+        #     print('receive')
         message = event['message']
 
         # Send message to WebSocket

@@ -14,14 +14,21 @@ def index(request):
 def chatPage(request, username):
     # user_obj = User.objects.get(username=username)
     user_obj = get_object_or_404(User, username=username)
-    users = User.objects.exclude(username=request.user.username)
+    # users = User.objects.exclude(username=request.user.username)
 
     if request.user.id > user_obj.id:
         thread_name = f'chat_{request.user.id}-{user_obj.id}'
     else:
         thread_name = f'chat_{user_obj.id}-{request.user.id}'
     message_objs = ChatModel.objects.filter(thread_name=thread_name)
-    return render(request, 'chat/main_chat.html', context={'user': user_obj, 'users': users, 'messages': message_objs})
+    if request.user.id % 2:
+        user_class = 'doctor'
+    else:
+        user_class = 'patient'
+    return render(request, 'chat/main_chat.html', context={'user': user_obj, 'messages': message_objs, 'user_class': user_class})
+
+def inference(request):
+    pass
 
 # def room(request, room_name):
 #     return render(request, 'chat/room.html', {
