@@ -1,6 +1,6 @@
 name: sign_experiment
 data:
-    data_path: ./data/
+    data_path: inference/data/
     version: phoenix_2014_trans
     sgn: sign
     txt: text
@@ -47,7 +47,7 @@ training:
     reset_scheduler: false
     reset_optimizer: false
     random_seed: 42
-    model_dir: "./dcba01"
+    model_dir: "inference/dcba01"
     recognition_loss_weight: 1.0
     translation_loss_weight: 1.0
     eval_metric: bleu

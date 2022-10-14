@@ -8,6 +8,7 @@ app_name = 'chat'
 urlpatterns = [
     path('', views.index, name='home'),
     path('chat/<str:username>/', views.chatPage, name='chat'),    
+    path('inference/', views.inferenceCall, name='inference')
 ]
 
     # path('', views.index, name='index'),

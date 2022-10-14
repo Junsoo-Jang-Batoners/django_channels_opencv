@@ -11,19 +11,19 @@ import torch.nn as nn
 
 from typing import List
 from torchtext.data import Dataset
-from inference.signjoey.loss import XentLoss
-from inference.signjoey.helpers import (
+from signjoey.loss import XentLoss
+from signjoey.helpers import (
     bpe_postprocess,
     load_config,
     get_latest_checkpoint,
     load_checkpoint,
 )
-from inference.signjoey.metrics import bleu, chrf, rouge, wer_list
-from inference.signjoey.model import build_model, SignModel
-from inference.signjoey.batch import Batch
-from inference.signjoey.data import load_data, make_data_iter, load_inference, load_inference_data
-from inference.signjoey.vocabulary import PAD_TOKEN, SIL_TOKEN
-from inference.signjoey.phoenix_utils.phoenix_cleanup import (
+from signjoey.metrics import bleu, chrf, rouge, wer_list
+from signjoey.model import build_model, SignModel
+from signjoey.batch import Batch
+from signjoey.data import load_data, make_data_iter, load_inference, load_inference_data
+from signjoey.vocabulary import PAD_TOKEN, SIL_TOKEN
+from signjoey.phoenix_utils.phoenix_cleanup import (
     clean_phoenix_2014,
     clean_phoenix_2014_trans,
 )
@@ -228,7 +228,7 @@ def validate_on_data(
 
 # pylint: disable-msg=logging-too-many-args
 def inference(
-    cfg_file, ckpt: str, inf_dir: str, logger: logging.Logger = None, 
+    cfg_file, ckpt: str, logger: logging.Logger = None
 ) -> None:
     """
     Main test function. Handles loading a model from checkpoint, generating
@@ -274,9 +274,6 @@ def inference(
     # Flag = True
     # start_time = time.time()
     # while Flag:
-    print(cfg['data'])
-    cfg['data']['dev'] = inf_dir
-    print(cfg['data'])
     _, dev_data, test_data, gls_vocab, txt_vocab = load_inference(data_cfg=cfg["data"])
     # end_time = time.time()
     # print(f'load data 소요시간: {end_time - start_time}')  
@@ -361,7 +358,7 @@ def inference(
         # print('test3')
         # Dev Recognition CTC Beam Search Results
         # dev_recognition_results = {}
-        # inf_result = ''
+        inf_result = ''
         # dev_best_wer_score = float("inf")
         # dev_best_recognition_beam_size = 1
         # print(recognition_beam_sizes)
@@ -369,7 +366,7 @@ def inference(
             # logger.info("-" * 60)
             # valid_start_time = time.time()
             # logger.info("[DEV] partition [RECOGNITION] experiment [BW]: %d", rbw)
-        # start_time = time.time()
+        start_time = time.time()
         inf_result = validate_on_data(
             model=model,
             data=dev_data,
@@ -399,11 +396,9 @@ def inference(
             translation_beam_size=1 if do_translation else None,
             translation_beam_alpha=-1 if do_translation else None,
             frame_subsampling_ratio=frame_subsampling_ratio,
-        )[0]
-        # print(inf_result)
-        return inf_result
-        # end_time = time.time()
-        # print(f'validate 소요시간: {end_time - start_time}')
+        )
+        end_time = time.time()
+        print(f'validate 소요시간: {end_time - start_time}')
             # logger.info("finished in %.4fs ", time.time() - valid_start_time)
             # if dev_recognition_results[rbw]["valid_scores"]["wer"] < dev_best_wer_score:
             #     dev_best_wer_score = dev_recognition_results[rbw]["valid_scores"]["wer"]
@@ -430,10 +425,10 @@ def inference(
 
     # print(dev_recognition_results)
 
-    # Flag = True
-    # while Flag:
+    Flag = True
+    while Flag:
         # print(dev_data)
-        # print(f'inference 결과: {inf_result[0]}')
+        print(f'inference 결과: {inf_result[0]}')
         # print(cfg['data']['dev'])
         # start_time = time.time()
         # inf_result = validate_on_data(
@@ -469,11 +464,11 @@ def inference(
         # end_time = time.time()
         # print(inf_result)
         # print(f'validate 시간: {end_time - start_time}')
-        # text_input = input('새 inf 파일명 입력: ')
-        # if not text_input:
-        #     break
+        text_input = input('새 inf 파일명 입력: ')
+        if not text_input:
+            break
         # start_time = time.time()
-        # new_dev_data = load_inference_data(data_cfg=cfg["data"], inf_data_name=text_input)
+        new_dev_data = load_inference_data(data_cfg=cfg["data"], inf_data_name=text_input)
         # end_time = time.time()
         # print(f'load inf data 시간 : {end_time - start_time}')
         # start_time = time.time()
@@ -483,8 +478,8 @@ def inference(
         # print(dir(new_dev_data.fields['gls']))
         # print(new_dev_data.fields['gls'].vocab)
         # print(new_dev_data.fields['gls'].vocab_cls)
-        # new_dev_data.fields['gls'].vocab = gls_vocab
-        # new_dev_data.fields['txt'].vocab = txt_vocab
+        new_dev_data.fields['gls'].vocab = gls_vocab
+        new_dev_data.fields['txt'].vocab = txt_vocab
 
         # print(new_dev_data.fields['gls'])
         # print(new_dev_data.fields['gls'].vocab)
@@ -492,41 +487,41 @@ def inference(
         # new_dev_data.fields['txt'] = txt_vocab
         # print(new_dev_data.fields['txt'])
 
-        # inf_result = validate_on_data(
-        #         model=model,
-        #         data=new_dev_data,
-        #         batch_size=batch_size,
-        #         use_cuda=use_cuda,
-        #         batch_type=batch_type,
-        #         dataset_version=dataset_version,
-        #         sgn_dim=sum(cfg["data"]["feature_size"])
-        #         if isinstance(cfg["data"]["feature_size"], list)
-        #         else cfg["data"]["feature_size"],
-        #         txt_pad_index=txt_vocab.stoi[PAD_TOKEN],
-        #         # Recognition Parameters
-        #         do_recognition=do_recognition,
-        #         recognition_loss_function=recognition_loss_function,
-        #         recognition_loss_weight=1,
-        #         recognition_beam_size=1,
-        #         # Translation Parameters
-        #         do_translation=do_translation,
-        #         translation_loss_function=translation_loss_function
-        #         if do_translation
-        #         else None,
-        #         translation_loss_weight=1 if do_translation else None,
-        #         translation_max_output_length=translation_max_output_length
-        #         if do_translation
-        #         else None,
-        #         level=level if do_translation else None,
-        #         translation_beam_size=1 if do_translation else None,
-        #         translation_beam_alpha=-1 if do_translation else None,
-        #         frame_subsampling_ratio=frame_subsampling_ratio,
-            # )    
+        inf_result = validate_on_data(
+                model=model,
+                data=new_dev_data,
+                batch_size=batch_size,
+                use_cuda=use_cuda,
+                batch_type=batch_type,
+                dataset_version=dataset_version,
+                sgn_dim=sum(cfg["data"]["feature_size"])
+                if isinstance(cfg["data"]["feature_size"], list)
+                else cfg["data"]["feature_size"],
+                txt_pad_index=txt_vocab.stoi[PAD_TOKEN],
+                # Recognition Parameters
+                do_recognition=do_recognition,
+                recognition_loss_function=recognition_loss_function,
+                recognition_loss_weight=1,
+                recognition_beam_size=1,
+                # Translation Parameters
+                do_translation=do_translation,
+                translation_loss_function=translation_loss_function
+                if do_translation
+                else None,
+                translation_loss_weight=1 if do_translation else None,
+                translation_max_output_length=translation_max_output_length
+                if do_translation
+                else None,
+                level=level if do_translation else None,
+                translation_beam_size=1 if do_translation else None,
+                translation_beam_alpha=-1 if do_translation else None,
+                frame_subsampling_ratio=frame_subsampling_ratio,
+            )    
         # end_time = time.time()
         # print(f'새 validate 시간: {end_time - start_time}')
     
-        # if not text_input:
-            # Flag = False
+        if not text_input:
+            Flag = False
     # if do_translation:
     #     print('test4')
 

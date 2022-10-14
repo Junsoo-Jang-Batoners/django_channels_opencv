@@ -11,19 +11,19 @@ import torch.nn as nn
 
 from typing import List
 from torchtext.data import Dataset
-from inference.signjoey.loss import XentLoss
-from inference.signjoey.helpers import (
+from signjoey.loss import XentLoss
+from signjoey.helpers import (
     bpe_postprocess,
     load_config,
     get_latest_checkpoint,
     load_checkpoint,
 )
-from inference.signjoey.metrics import bleu, chrf, rouge, wer_list
-from inference.signjoey.model import build_model, SignModel
-from inference.signjoey.batch import Batch
-from inference.signjoey.data import load_data, make_data_iter, load_inference, load_inference_data
-from inference.signjoey.vocabulary import PAD_TOKEN, SIL_TOKEN
-from inference.signjoey.phoenix_utils.phoenix_cleanup import (
+from signjoey.metrics import bleu, chrf, rouge, wer_list
+from signjoey.model import build_model, SignModel
+from signjoey.batch import Batch
+from signjoey.data import load_data, make_data_iter, load_inference, load_inference_data
+from signjoey.vocabulary import PAD_TOKEN, SIL_TOKEN
+from signjoey.phoenix_utils.phoenix_cleanup import (
     clean_phoenix_2014,
     clean_phoenix_2014_trans,
 )
@@ -228,7 +228,7 @@ def validate_on_data(
 
 # pylint: disable-msg=logging-too-many-args
 def inference(
-    cfg_file, ckpt: str, inf_dir: str, logger: logging.Logger = None, 
+    cfg_file, ckpt: str, logger: logging.Logger = None
 ) -> None:
     """
     Main test function. Handles loading a model from checkpoint, generating
@@ -274,9 +274,7 @@ def inference(
     # Flag = True
     # start_time = time.time()
     # while Flag:
-    print(cfg['data'])
-    cfg['data']['dev'] = inf_dir
-    print(cfg['data'])
+    print(f'data': {cfg['data']})
     _, dev_data, test_data, gls_vocab, txt_vocab = load_inference(data_cfg=cfg["data"])
     # end_time = time.time()
     # print(f'load data 소요시간: {end_time - start_time}')  

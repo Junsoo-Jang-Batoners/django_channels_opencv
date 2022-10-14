@@ -64,7 +64,7 @@ def extract_keypoints(results):
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     # filename = './[mix]P73_U19_N1.mp4'
     filecnt = 1
-    filename = 'rt_inf_' + str(filecnt) + '.inference'
+    filename = 'inference/data/DCBA/rt_inf_' + str(filecnt) + '.inference'
     cap = cv2.VideoCapture(0)
     cnt = 0 
     data = {}
@@ -74,14 +74,14 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
     data['text'] = ''
     sign = []
     quit_cnt = 0
-    flag = True
+    flag = False
     former_keypoints = [0 for _ in range(96)]
 
     # 비디오 녹화해서 넘겨주기 위해
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter('testvid'+str(filecnt)+'.avi', fourcc, 30.0, (int(width), int(height)))
+    # out = cv2.VideoWriter('inference/data/DCBA/rt_inf_' + str(filecnt) + '.avi', fourcc, 30.0, (int(width), int(height)))
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -89,18 +89,17 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             break
         
         # frame 저장
-        out.write(frame)
 
         # 프레임 카운트
         cnt += 1
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # Make Detections
-        start_time = time.time()
+        # start_time = time.time()
         results = holistic.process(image)
-        end_time = time.time()
-        print(f'소요시간: {end_time - start_time}')
+        # end_time = time.time()
+        # print(f'소요시간: {end_time - start_time}')
         keypoints = extract_keypoints(results)
-        print(keypoints)
+        # print(keypoints)
         
         # print(type(keypoints))
         # print(len(keypoints))
@@ -121,6 +120,8 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         # 촬영 상태면 sign에 keypoints 추가
         if flag:
             sign.append(keypoints)
+            out.write(frame)
+
 
         # 직전 프레임의 keypoints 따로 저장
         former_keypoints = keypoints
@@ -139,6 +140,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         if results.left_hand_landmarks and results.right_hand_landmarks and not flag:
             quit_cnt = 0
             flag = True
+            out = cv2.VideoWriter('inference/data/DCBA/rt_inf_' + str(filecnt) + '.avi', fourcc, 30.0, (int(width), int(height)))
             print('restart')
         
         # 30 프레임 (1초) 동안 양손이 보이지 않았는데 촬영 상태였다면
@@ -157,20 +159,19 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             
             # filename 을 server로 보내 inference 결과를 얻어온다.
 
-            inference_result = ''
+            # inference_result = ''
 
-            print(f'추론 결과: {inference_result}')
+            # print(f'추론 결과: {inference_result}')
 
 
             # 새로 sign 저장하기 위해 sign은 초기화
             sign = []
             # 파일명 새로 지정하기 위해 번호 +1 하여 파일명 새로 부여
             filecnt += 1
-            filename = 'test' + str(filecnt) + '.test'
+            filename = 'inference/data/DCBA/rt_inf_' + str(filecnt) + '.inference'
 
             # 지금까지의 frame out release 하고 새로
             out.release()
-            out = cv2.VideoWriter('testvid'+str(filecnt)+'.avi', fourcc, 30.0, (int(width), int(height)))
 
        
         # Recolor image back to BGR for rendering
@@ -188,8 +189,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
         # Pose Detections
         mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
-
-
 
 
         cv2.imshow('Mediapipe', image)

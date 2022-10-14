@@ -8,20 +8,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from itertools import groupby
-from signjoey.initialization import initialize_model
-from signjoey.embeddings import Embeddings, SpatialEmbeddings
-from signjoey.encoders import Encoder, RecurrentEncoder, TransformerEncoder
-from signjoey.decoders import Decoder, RecurrentDecoder, TransformerDecoder
-from signjoey.search import beam_search, greedy
-from signjoey.vocabulary import (
+from inference.signjoey.initialization import initialize_model
+from inference.signjoey.embeddings import Embeddings, SpatialEmbeddings
+from inference.signjoey.encoders import Encoder, RecurrentEncoder, TransformerEncoder
+from inference.signjoey.decoders import Decoder, RecurrentDecoder, TransformerDecoder
+from inference.signjoey.search import beam_search, greedy
+from inference.signjoey.vocabulary import (
     TextVocabulary,
     GlossVocabulary,
     PAD_TOKEN,
     EOS_TOKEN,
     BOS_TOKEN,
 )
-from signjoey.batch import Batch
-from signjoey.helpers import freeze_params
+from inference.signjoey.batch import Batch
+from inference.signjoey.helpers import freeze_params
 from torch import Tensor
 from typing import Union
 

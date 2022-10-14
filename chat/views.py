@@ -2,6 +2,17 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from chat.models import ChatModel
+from django.http import JsonResponse
+import json
+
+# from inference.signjoey.inferencecalltest import inferencetestcall
+from inference.signjoey.inference import inference
+
+cfg_file = 'inference/configs/sign_dcba_inf.yaml'
+
+ckpt = None
+
+filecnt = 1
 # Create your views here.
 
 
@@ -27,8 +38,26 @@ def chatPage(request, username):
         user_class = 'patient'
     return render(request, 'chat/main_chat.html', context={'user': user_obj, 'messages': message_objs, 'user_class': user_class})
 
-def inference(request):
-    pass
+def inferenceCall(request):
+    global filecnt 
+
+    # user_obj = get_object_or_404(User, username=username)
+    if request.method == 'GET':
+        return render(request, 'chat/inference_test.html', context={'inference_result': 'Not allowed connection'})
+    elif request.method == 'POST':
+        print(filecnt)
+
+        inffilename = 'DCBA/rt_inf_' + str(filecnt) + '.inference'
+
+        inference_result = inference(cfg_file=cfg_file, ckpt=ckpt, inf_dir=inffilename)
+
+        filecnt += 1
+
+        jsonObject = json.loads(request.body)
+        jsonObject['message'] = inference_result
+        # print(jsonObject)
+        # return render(request, 'chat/main_chat.html', context={'inference_result': inference_result})
+        return JsonResponse(jsonObject)
 
 # def room(request, room_name):
 #     return render(request, 'chat/room.html', {

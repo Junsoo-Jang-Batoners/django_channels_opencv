@@ -11,8 +11,8 @@ import torch
 from torchtext import data
 from torchtext.data import Dataset, Iterator
 import socket
-from signjoey.infdataset import SignTranslationDataset, InferenceDataset
-from signjoey.vocabulary import (
+from inference.signjoey.infdataset import SignTranslationDataset, InferenceDataset
+from inference.signjoey.vocabulary import (
     build_vocab,
     Vocabulary,
     UNK_TOKEN,

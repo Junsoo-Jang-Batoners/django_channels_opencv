@@ -11,6 +11,7 @@ sys.path.append("/vol/research/extol/personal/cihan/code/SignJoey")
 
 def main():
     ap = argparse.ArgumentParser("Joey NMT")
+    print(f'ap: {ap}')
 
     ap.add_argument("mode", choices=["train", "test", "inference"], help="train a model or test, or inference")
 
@@ -23,6 +24,8 @@ def main():
     )
     ap.add_argument("--gpu_id", type=str, default="0", help="gpu to run your job on")
     args = ap.parse_args()
+    print(f'args: {args}')
+    print(f'args.ckpt: {args.ckpt}')
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
 

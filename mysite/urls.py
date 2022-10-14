@@ -18,12 +18,13 @@ from django.conf.urls import include
 from django.urls import path
 from django.contrib import admin
 
-from chat.views import index, chatPage
+from chat.views import index, chatPage, inferenceCall
 
 urlpatterns = [
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('', index, name='home'),
     path('chat/<str:username>/', chatPage, name='chat'),
+    path('inference/', inferenceCall, name='inference'),
     path('video/', include('video.urls')),
     path('admin/', admin.site.urls),
 ]
