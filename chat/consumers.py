@@ -28,24 +28,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         message = data['message']
         username = data['username']
+        if data.get('vid_dir'):
+            vid_dir = data['vid_dir']
+        else:
+            vid_dir = ''
 
-        await self.save_message(username, self.room_group_name, message)
+        await self.save_message(username, self.room_group_name, message, vid_dir)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
                 'message': message,
                 'username': username,
+                'vid_dir': vid_dir
             }
         )
 
     async def chat_message(self, event):
         message = event['message']
         username = event['username']
+        vid_dir = event['vid_dir']
 
         await self.send(text_data=json.dumps({
             'message': message,
-            'username': username
+            'username': username,
+            'vid_dir': vid_dir,
         }))
 
     async def disconnect(self, code):
@@ -55,6 +62,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     @database_sync_to_async
-    def save_message(self, username, thread_name, message):
+    def save_message(self, username, thread_name, message, vid_dir):
         ChatModel.objects.create(
-            sender=username, message=message, thread_name=thread_name)
+            sender=username, message=message, thread_name=thread_name, vid_dir=vid_dir)

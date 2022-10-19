@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SignLanguage{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="back-container">
+    <div class="container front-container1" style="max-width: 720px">
+        <div class="jSeexT">
+            <div class="cmBguW">
+                <img id="resImg" src="" width="100%"/>
+            </div>
+            <div class="message-area">
+                <div class="message-table-scroll">
+                    <table class="table">
+                        <tbody id='chat-body'>
+                            {% for message in messages %}
+                            {% if message.sender ==<tr>
+                                <td>
+                                    <p><small class="shadow-sm float-right">{{message.timestamp|date:'y.m.d H:i'}}</small>
+                                    </p>
+                                 z   <p class="bg-success p-3 shadow-sm text-white float-right rounded">
+                                        {{message.message}}
+                                    </p>
+                                    </td>
+                                    <td>
+                                    {% if message.vid_dir %}
+                                    <video width="50%" class="shadow-sm float-right" controls autoplay muted loop>
+                                        <source src="{% static message.vid_dir %}" type="video/mp4"> </source> 
+                                    </video>
+                                    {% else %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td>
+                                    <p><small class="shadow-sm float-left">{{message.timestamp|date:'y.m.d H:i'}}</small>
+                                    </p>
+                                    <p class="bg-primary p-3 shadow-sm text-white float-left rounded">
+                                        {{message.message}}
+                                    </p>
+                                    <td>
+                                        {% if message.vid_dir %}
+                                        <video width="50%" class="shadow-sm float-right" controls autoplay muted loop>
+                                            <source src="{% static message.vid_dir %}" type="video/mp4"> </source> 
+                                        </video>
+                                        {% else %}
+                                        {% endif %}
+                                    </td>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="message-box">
+                    <form class="input_form">
+                        <input
+                          id="message_input"
+                          name="text"
+                          placeholder="메시지를 입력하세요"
+                          class="text_input_area"
+                          value=""
+                        />
+                        <button type="chat-message-submit" class="submit_btn">
+                          <i class="arrow right"></i>
+                        </button>
+                      </form>                    
+                        <button class="btn btn-success" id="chat-message-submit">전송</button>
+                        <button class="btn btn-outline-warning btnAjax_STT">음성 인식</button>
+                        {% if user_class == 'patient' %}
+                        <button class="btn btn-outline-info btnAjax">수어 번역</button>
+                        {% elif user_class == 'doctor' %}
+                            <button class="btn btn-info btnAjax_Avatar">수어 아바타</button>
+                        {% else %}
+                            <input type="button" class="btnAjax" value="수어 통역">
+                            <input type="button" class="btnAjax_Avatar" value="수어 아바타">
+                            <!-- <form method="post" action="{% url 'inference' %}">
+                                {% csrf_token %}
+                                <button class="btn btn-primary">INF</button>
+                            </form> -->
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- {{inference_result}}
+    {{user.id|json_script:"json-username"}} -->
+
+    <!-- {{user_class}} -->
+
+
+</div>
+
+
+{{user.id|json_script:"json-username"}}
+{{request.user.username|json_script:"json-message-username"}}
+{{user_class|json_script:"json-userclass"}}
+{{inference_result|json_script:"json-inference-result"}}
+
+{% endblock %}
+
+
+{% block javascript %}
+
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script>
+    // console.log(inference_result)
+    console.log(document)
+    const id = JSON.parse(document.getElementById('json-username').textContent);
+    const message_username = JSON.parse(document.getElementById('json-message-username').textContent);
+    const userclass = JSON.parse(document.getElementById('json-userclass').textContent);
+    const inference_result = JSON.parse(document.getElementById('json-inference-result').textContent);
+
+    console.log(inference_result)
+
+    const socket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + id
+        + '/'
+    );
+
+    socket.onopen = function(e){
+        console.log("CONNECTION ESTABLISHED");
+    }
+
+    socket.onclose = function(e){
+        console.log("CONNECTION LOST");
+    }
+
+    socket.onerror = function(e){
+        console.log("ERROR OCCURED");
+    }
+
+    socket.onmessage = function(e){
+        const data = JSON.parse(e.data);
+        console.log('onmessage')
+        console.log(data)
+        
+        if (data.vid_dir){
+            if(data.username == message_username){
+                document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                        <td>
+                                                                        <p class="bg-success p-3 shadow-sm text-white float-right rounded">${data.message}</p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <video width="50%" class="shadow-sm float-right" controls autoplay muted loop>
+                                                                            <source src="/static/${data.vid_dir}" type="video/mp4"> </source> 
+                                                                            </video>
+                                                                        </td>
+                                                                    </tr>`
+            }else{
+                document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                        <td>
+                                                                        <p class="bg-primary p-3 shadow-sm text-white float-left rounded">${data.message}</p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <video width="50%" class="shadow-sm float-right" controls autoplay muted loop>
+                                                                            <source src="/static/${data.vid_dir}" type="video/mp4"> </source> 
+                                                                            </video>
+                                                                        </td>
+                                                                    </tr>`
+        }
+        }else{
+            if(data.username == message_username){
+                document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                        <td>
+                                                                        <p class="bg-success p-3 shadow-sm text-white float-right rounded">${data.message}</p>
+                                                                        </td>
+                                                                    </tr>`
+            }else{
+                document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                        <td>
+                                                                        <p class="bg-primary p-3 shadow-sm text-white float-left rounded">${data.message}</p>
+                                                                        </td>
+                                                                    </tr>`
+            }
+        }
+
+        document.querySelector(".message-table-scroll").scrollTop = document.querySelector(".message-table-scroll").scrollHeight;
+
+    }
+
+    document.querySelector('#chat-message-submit').onclick = function(e){
+        const message_input = document.querySelector('#message_input');
+        const message = message_input.value;
+
+        // console.log(nowTime)
+        // console.log(typeof nowTime)
+
+        socket.send(JSON.stringify({
+            'message':message,
+            'username':message_username,
+        }));
+
+        message_input.value = '';
+    }
+
+
+    if (userclass == 'patient') {
+        console.log('patient login')
+        // video part 
+        const ws = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/video/'
+            + 'wms'
+            + '/'
+        );
+        
+        ws.onmessage = function(evt) {
+            v_data = JSON.parse(evt.data);
+            $("#resImg").attr("src", v_data.message);
+            //console.log( "Received Message: " + v_data.message);
+            // ws.close();
+        };
+
+        ws.onclose = function(evt) {
+            console.log("Connection closed.");
+        };
+
+        let btnAjax = document.querySelector('.btnAjax');
+    
+        btnAjax.addEventListener('click', e => {
+            let param = {
+                'message' : inference_result,
+                'username' : message_username
+            }
+            $.ajax({
+                url: '{% url 'inference' %}',
+                type: 'POST',
+                headers: {
+                    'X-CSRFTOKEN': '{{ csrf_token }}'
+                },
+                data: JSON.stringify(param),
+                success: function(data){
+                    console.log(data);
+                    socket.send(JSON.stringify(
+                        data
+                    ));
+                },
+                error: function(){
+                    alert('NOPE');
+                }
+            });
+        });
+    } else if (userclass == 'doctor') {
+
+        let btnAjax_Avatar = document.querySelector('.btnAjax_Avatar');
+    
+        btnAjax_Avatar.addEventListener('click', e => {
+            const message_input = document.querySelector('#message_input');
+            const message = message_input.value;
+
+            let param = {
+                'message' : message,
+                'username' : message_username
+            }
+            $.ajax({
+                url: '{% url 'slavatar' %}',
+                type: 'POST',
+                headers: {
+                    'X-CSRFTOKEN': '{{ csrf_token }}'
+                },
+                data: JSON.stringify(param),
+                success: function(data){
+                    console.log(data);
+                    socket.send(JSON.stringify(
+                        data
+                    ));
+                },
+                error: function(){
+                    alert('NOPE');
+                }
+            });
+
+            message_input.value = '';
+        })
+    }
+
+    // // video part 
+    // const ws = new WebSocket(
+    //     'ws://'
+    //     + window.location.host
+    //     + '/ws/video/'
+    //     + 'wms'
+    //     + '/'
+    // );
+    
+    // console.log(document)
+    // ws.onmessage = function(evt) {
+    //     v_data = JSON.parse(evt.data);
+    //     $("#resImg").attr("src", v_data.message);
+    //     //console.log( "Received Message: " + v_data.message);
+    //     // ws.close();
+    // };
+
+    // ws.onclose = function(evt) {
+    //     console.log("Connection closed.");
+    // };
+
+    // console.log(userclass)
+
+
+    // ajax for inference
+
+
+
+    // // ajax for avatar loading
+
+
+    // scroll down
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector(".message-table-scroll").scrollTop =
+        document.querySelector(".message-table-scroll").scrollHeight;
+        });
+
+
+    // enter submit
+    // document.querySelector("form").onsubmit = function (e) {
+    //     const message_input = document.querySelector("#message_input");
+    //     const message = message_input.value;
+
+    //     socket.send(
+    //         JSON.stringify({
+    //             message: message,
+    //             username: message_username,
+    //     })
+    // );
+
+    // message_input.value = "";
+    // };
+</script>
+{% endblock %}

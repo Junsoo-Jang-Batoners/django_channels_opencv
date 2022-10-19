@@ -67,8 +67,8 @@ async def send_video(websocket):
 
             # mediapipe
             cnt += 1
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results = holistic.process(frame)
+            frame_mp = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = holistic.process(frame_mp)
             keypoints = extract_keypoints(results)
 
             if not results.pose_landmarks:

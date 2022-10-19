@@ -1,0 +1,442 @@
+{% extends 'base.html' %} {% load static %} {% block title %}SignLanguage{%
+endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}" />
+<style>
+  .arrow {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 4px;
+    margin-right: 3px;
+  }
+
+  .right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+  }
+  .text_input_area {
+    width: 100%;
+    height: 100%;
+    display: block;
+    outline: none;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  .chat_profile {
+    width: 30px;
+    height: 30px;
+    display: block;
+    border-radius: 10px;
+    -webkit-transition: all 0.4s;
+    transition: all 0.4s;
+  }
+  div[data-sent="true"] > .chat_profile {
+    display: none;
+  }
+  .cikXLt {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+  }
+  .opposite_img {
+    width: 30px;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    border-radius: 50%;
+    margin-right: 12px;
+    display: flex;
+    cursor: pointer;
+  }
+  .iBQKRr {
+    width: 23px;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    cursor: pointer;
+  }
+  .send_message_sender {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  div[data-sent="true"] > div > .send_message_sender {
+    display: none;
+  }
+  .kuzoXe {
+    display: block;
+    background-color: #7f7f7f;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 15px;
+    padding: 2px 15px;
+    margin: 10px 0;
+  }
+  .message_timestamp {
+    display: block;
+    color: #454545;
+    font-size: 12px;
+    margin: 0px 0px 5px 2px;
+  }
+  .input_area {
+    width: 100%;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    background-color: white;
+    padding: 10px 15px;
+  }
+  .input_form {
+    width: 100%;
+    height: 45px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    border: 1px solid #b8b8b8;
+    border-radius: 5px;
+  }
+  .submit_btn {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    background-color: #8a74ff;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+  .chat_area {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: 10px;
+  }
+  .chat_area[data-sent="true"] {
+    margin-top: 0;
+    -webkit-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+  }
+  .message {
+    width: auto;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    margin-left: 10px;
+  }
+  .chat_content {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: flex-end;
+    -webkit-box-align: flex-end;
+    -ms-flex-align: flex-end;
+    align-items: flex-end;
+  }
+  div[data-sent="true"] > div > .chat_content {
+    -webkit-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+  }
+  .chat_message {
+    width: auto;
+    height: auto;
+    max-width: 190px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    background-color: white;
+    box-shadow: 1px 1px 1px #d2d2d2;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 5px 15px;
+    margin: 5px 5px;
+  }
+  div[data-sent="true"] > div > div > .chat_message {
+    background-color: #fef01b;
+    color: black;
+  }
+  .cqICGF {
+    width: 100%;
+    height: 100%;
+    padding: 20px 10px;
+    overflow-y: auto;
+  }
+  .cqICGF::-webkit-scrollbar {
+    display: none;
+  }
+  .fwbkNk {
+    width: auto;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+  .cmBguW {
+    width: 100%;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    background-color: white;
+    padding: 10px 15px;
+  }
+  .jSeexT {
+    width: 100%;
+    height: 720px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    background-color: #9bbbd4;
+    position: relative;
+    right: -100px;
+  }
+  .gCRleq {
+    width: 100%;
+    height: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #222222;
+  }
+  body {
+    margin: 0 0;
+    padding: 0 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #333;
+  }
+  * {
+    box-sizing: inherit;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  input,
+  button,
+  textarea {
+    font-family: inherit;
+  }
+  .deJA-dG {
+    width: 100%;
+    height: 100%;
+    padding: 20px 10px;
+    overflow-y: auto;
+  }
+  .deJA-dG::-webkit-scrollbar {
+    display: none;
+  }
+  .lhGtvw {
+    width: auto;
+    height: auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+  .flaVw {
+    width: 100%;
+    height: 100%;
+    padding: 20px 10px;
+    overflow-y: auto;
+  }
+  .flaVw::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="back-container">
+  <div class="container front-container1" style="max-width: 500px">
+    <div class="sc-fFSPTT jSeexT">
+      <div class="sc-fnVZcZ cmBguW">
+        <img
+          src="{% static 'assets/dp.png' %}"
+          alt=""
+          class="opposite_img"
+        />
+        {{user.username}}
+      </div>
+      <div id="scroll" class="sc-hHEiqL flaVw">
+        <div data-sent="true" class="chat_area">
+          <img
+            src="https://imgur.com/lfH8tyf.png"
+            alt=""
+            class="chat_profile"
+          />
+          <div class="message">
+            <span class="send_message_sender">상대편</span>
+            <div class="chat_content">
+              <div class="chat_message">안녕하세요<br /></div>
+              <span class="message_timestamp">오후 1:00</span>
+            </div>
+          </div>
+        </div>
+        <div data-sent="false" class="chat_area">
+          <img
+            src="https://imgur.com/lfH8tyf.png"
+            alt=""
+            class="chat_profile"
+          />
+          <div class="message">
+            <span class="send_message_sender">상대편</span>
+            <div class="chat_content">
+              <div class="chat_message">안녕하세요. <br /></div>
+              <span class="message_timestamp">오후 1:00</span>
+            </div>
+          </div>
+        </div>
+        <div data-sent="true" class="chat_area">
+          <img
+            src="https://imgur.com/lfH8tyf.png"
+            alt=""
+            class="chat_profile"
+          />
+          <div class="message">
+            <span class="send_message_sender">상대편</span>
+            <div class="chat_content">
+              <div class="chat_message">
+                테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다테스트 중입니다테스트 중입니다테스트
+                중입니다테스트 중입니다<br />
+              </div>
+              <span class="message_timestamp">오전 9:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="input_area">
+        <form class="input_form">
+          <input
+            id="message_input"
+            name="text"
+            placeholder="메시지를 입력하세요"
+            class="text_input_area"
+            value=""
+          />
+          <button type="submit" class="submit_btn">
+            <i class="arrow right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    <img
+      src="http://127.0.0.1:8000/video_stream"
+      style="
+        width: 240px;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        margin: auto 0;
+        top: 0;
+      "
+    />
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("scroll").scrollTop =
+      document.getElementById("scroll").scrollHeight;
+  });
+
+  document.querySelector("form").onsubmit = function (e) {
+    const message_input = document.querySelector("#message_input");
+    const message = message_input.value;
+
+    socket.send(
+      JSON.stringify({
+        message: message,
+        username: message_username,
+      })
+    );
+
+    message_input.value = "";
+  };
+</script>
+{{user.id|json_script:"json-username"}}
+{{request.user.username|json_script:"json-message-username"}} {% endblock %} {%
+block javascript %} {% endblock %}
+<script src="{% static 'js/chat.js' %}"></script>
+
+<!-- {% block body %} -->
+<!-- <table>
+        <tr>
+            <td width="100%">
+                <img src="http://127.0.0.1:8000/video_stream" style="width:200px;" />
+            </td>
+        </tr>
+    </table> -->
+<!-- {% endblock %} -->

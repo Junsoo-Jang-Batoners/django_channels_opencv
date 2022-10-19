@@ -274,7 +274,6 @@ def inference(
     # Flag = True
     # start_time = time.time()
     # while Flag:
-    print(f'data': {cfg['data']})
     _, dev_data, test_data, gls_vocab, txt_vocab = load_inference(data_cfg=cfg["data"])
     # end_time = time.time()
     # print(f'load data 소요시간: {end_time - start_time}')  

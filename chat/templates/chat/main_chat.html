@@ -1,90 +1,350 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} 
+{% load static %} 
 
-{% block title %}SignLanguage{% endblock %}
+{% block title %}SignLanguage{%endblock %} 
+<style>
 
+.arrow {
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 4px;
+  margin-right: 3px;
+}
+
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
+.text_input_area {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  border: 1px solid #b8b8b8;
+
+}
+.chat_profile {
+  width: 30px;
+  height: 30px;
+  display: block;
+  border-radius: 10px;
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+}
+div[data-sent="true"] > .chat_profile {
+  display: none;
+}
+.opposite_img {
+  width: 30px;
+  height: auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  border-radius: 50%;
+  margin-right: 12px;
+  display: flex;
+  cursor: pointer;
+}
+.receive_message_sender {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+}
+div[data-sent="true"] > div > .receive_message_sender {
+  display: none;
+}
+.message_timestamp {
+  display: block;
+  color: #454545;
+  font-size: 12px;
+  margin: 0px 0px 5px 2px;
+}
+.input_area {
+  width: 100%;
+  height: auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: white;
+  padding: 10px 15px;
+}
+.input_form {
+  width: 100%;
+  height: 45px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-radius: 5px;
+  gap: 10px;
+}
+.submit_btn {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  background-color: #8a74ff;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 8px;
+  opacity: 0.5;
+}
+.chat_area {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  margin-top: 10px;
+}
+.chat_area[data-sent="true"] {
+  margin-top: 0;
+  -webkit-flex-direction: row-reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+.chatroom_chat {
+  width: auto;
+  height: auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-left: 10px;
+}
+.chat_content {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+div[data-sent="true"] > div > .chat_content {
+  -webkit-flex-direction: row-reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+.chat_message {
+  width: auto;
+  height: auto;
+  max-width: 190px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: white;
+  box-shadow: 1px 1px 1px #d2d2d2;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 5px 15px;
+  margin: 5px 5px;
+  line-break: anywhere;
+}
+div[data-sent="true"] > div > div > .chat_message {
+  background-color: #fef01b;
+  color: black;
+}
+
+
+.opposite_profile {
+  width: 100%;
+  height: auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: white;
+  padding: 10px 15px;
+}
+.inner-container {
+  width: 100%;
+  height: 720px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  background-color: #9bbbd4;
+  position: relative;
+  right: -100px;
+}
+
+body {
+  margin: 0 0;
+  padding: 0 0;
+  box-sizing: border-box;
+  font-family: "Noto Sans KR", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #333;
+}
+* {
+  box-sizing: inherit;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+input,
+button,
+textarea {
+  font-family: inherit;
+}
+
+.chatroom {
+  width: 100%;
+  height: 100%;
+  padding: 20px 10px;
+  overflow-y: auto;
+}
+
+.message-box{
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;  
+}
+</style>
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/index.css' %}">
-{% endblock %}
-
+<link rel="stylesheet" href="{% static 'css/index.css' %}" />
+{% endblock %} 
 
 {% block content %}
 <div class="back-container">
-    <div class="container front-container1">
-        <div class="row chat-top">
-            <div class="col-sm-12">
-                <img src="{% static 'assets/dp.png' %}" alt="" class="profile-image rounded-circle">
-                <span class="ml-2">{{user.username}} 와의 채팅방</span>
+  <div class="container front-container1" style="margin: 0px 300px; max-width: 720px">
+    <div class="inner-container">
+      <div class="opposite_profile">
+        <img
+          src="{% static 'assets/dp.png' %}"
+          alt=""
+          class="opposite_img"
+        />
+        {{user.username}} 와의 채팅방
+      </div>
+      <div id="scroll" class="chatroom">
+        {% for message in messages %}
+        {% if message.sender == request.user.username %}
+        <div data-sent="true" class="chat_area">
+          <img
+            src="{% static 'assets/dp.png' %}"
+            alt=""
+            class="chat_profile"
+          />
+          <div class="chatroom_chat">
+            <span class="receive_message_sender">{{ message.sender }}</span>
+            <div class="chat_content">
+              <div class="chat_message">{{message.message}}<br /></div>
+              <span class="message_timestamp">{{message.timestamp|date:'A h:i'}}</span>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-4">
-                <img id="resImg" src="" width="100%"/>
+            {% if message.vid_dir %}
+            <div class="chat_content">
+              <video width="252px" height="141px" class="shadow-sm float-right" style="border-radius:15px;" controls>
+                  <source src="{% static message.vid_dir %}" type="video/mp4"> </source> 
+              </video>
             </div>
-            <div class="col-sm-8 message-area">
-                <div class="message-table-scroll">
-                    <table class="table">
-                        <tbody id='chat-body'>
-                            {% for message in messages %}
-                            {% if message.sender == request.user.username %}
-                            <tr>
-                                <td>
-                                    <p><small class="p-1 shadow-sm float-right">{{message.timestamp|time:'H:i'}}</small>
-                                    </p>
-                                    <p class="bg-success p-2 mt-2 mr-5 shadow-sm text-white float-right rounded">
-                                        {{message.message}}
-                                    </p>
+            {% else %}
+            {% endif %}
 
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td>
-                                    <p><small class="p-1 shadow-sm float-left">{{message.timestamp|time:'H:i'}}</small>
-                                    </p>
-                                    <p class="bg-primary p-2 mt-2 mr-5 shadow-sm text-white float-left rounded">
-                                        {{message.message}}
-                                    </p>
-
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="row message-box p-3">
-                    <div class="col-sm-8">
-                        <input type="text" class="form-control" id="message_input" placeholder="메시지를 입력해주세요.">
-                    </div>
-                    <div class="col-sm-2 mt-1">
-                        <div class="control">
-                            <button class="btn btn-success" id="chat-message-submit">전송</button>
-                        </div>
-                    </div>
-                    <div class="col-sm-2 mt-1">
-                        {% if user_class == 'patient' %}
-                            <input type="button" class="btnAjax" value="수어 통역">
-                        {% elif user_class == 'doctor' %}
-                            <input type="button" class="btnAjax_Avatar" value="수어 아바타">
-                        {% else %}
-                            <form method="post" action="{% url 'inference' %}">
-                                {% csrf_token %}
-                                <button class="btn btn-primary">INF</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+        {% else %}
+        <div data-sent="false" class="chat_area">
+          <img
+            src="{% static 'assets/dp.png' %}"
+            alt=""
+            class="chat_profile"
+          />
+          <div class="chatroom_chat">
+            <span class="send_message_sender">{{ message.sender }}</span>
+            <div class="chat_content">
+              <div class="chat_message">{{message.message}}<br /></div>
+              <span class="message_timestamp">{{message.timestamp|date:'A h:i'}}</span>
+            </div>
+            <div>
+                {% if message.vid_dir %}
+                <video width="252px" height="141px"class="shadow-sm float-left" style="border-radius:15px;" controls>
+                    <source src="{% static message.vid_dir %}" type="video/mp4"> </source> 
+                </video>
+                {% else %}
+                {% endif %}
+              </div>
+        </div>
+
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <div class="message-box">
+        <form class="input_form">
+            <input
+              id="message_input"
+              name="text"
+              placeholder="메시지를 입력하세요"
+              class="text_input_area"
+              value=""
+            />
+            <button class="btn btn-success" id="chat-message-submit" style="white-space: nowrap; height: 100%;">전송</button>
+
+          </form>                    
+            {% if user_class == 'patient' %}
+              <button class="btn btn-outline-info btnAjax" style="width:80%">수어 번역</button>
+            {% elif user_class == 'doctor' %}
+              <button class="btn btn-info btnAjax_Avatar" style="width:80%">수어 아바타</button>
+            {% else %}
+              <input type="button" class="btnAjax" value="수어 통역">
+              <input type="button" class="btnAjax_Avatar" value="수어 아바타">
+                <!-- <form method="post" action="{% url 'inference' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary">INF</button>
+                </form> -->
+            {% endif %}
+            <button class="btn btn-outline-warning btnAjax_STT" style="width:80%">음성 인식</button>
+
+      
     </div>
-    <!-- {{inference_result}}
-    {{user.id|json_script:"json-username"}} -->
-
-    <!-- {{user_class}} -->
-
+  </div>
 
 </div>
+{% if user_class == 'patient' %}
+  <img id="resImg" src="" width="40%" style="border-radius: 20px; margin: 150px -100px"/>
+{% else %}
+{% endif %}
+
 
 
 {{user.id|json_script:"json-username"}}
@@ -92,149 +352,220 @@
 {{user_class|json_script:"json-userclass"}}
 {{inference_result|json_script:"json-inference-result"}}
 
-{% endblock %}
-
-
-{% block javascript %}
-
+{% endblock %} 
+{%block javascript %} 
 
 <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js" ></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script>
-    // console.log(inference_result)
-    console.log(document)
-    const id = JSON.parse(document.getElementById('json-username').textContent);
-    const message_username = JSON.parse(document.getElementById('json-message-username').textContent);
-    const userclass = JSON.parse(document.getElementById('json-userclass').textContent);
-    const inference_result = JSON.parse(document.getElementById('json-inference-result').textContent);
+  const id = JSON.parse(document.getElementById('json-username').textContent);
+const message_username = JSON.parse(document.getElementById('json-message-username').textContent);
+const userclass = JSON.parse(document.getElementById('json-userclass').textContent);
+const inference_result = JSON.parse(document.getElementById('json-inference-result').textContent);
 
-    console.log(inference_result)
+const socket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/'
+    + id
+    + '/'
+);
 
-    const socket = new WebSocket(
+socket.onopen = function(e){
+    console.log("CONNECTION ESTABLISHED");
+}
+
+socket.onclose = function(e){
+    console.log("CONNECTION LOST");
+}
+
+socket.onerror = function(e){
+    console.log("ERROR OCCURED");
+}
+
+socket.onmessage = function(e){
+    const data = JSON.parse(e.data);
+    console.log(data)
+    
+    if (data.vid_dir){
+        if(data.username == message_username){
+            document.querySelector('.chatroom').innerHTML += `<div data-sent="true" class="chat_area">
+                                                                <img src="/static/assets/dp.png" alt="" class="chat_profile" />
+                                                                <div class="chatroom_chat">
+                                                                <span class="receive_message_sender">${data.username}</span>
+                                                                <div class="chat_content">
+                                                                    <div class="chat_message">${data.message}<br /></div>
+                                                                </div>
+                                                                <div class="chat_content">
+                                                                <video width="252px" height="141px" class="shadow-sm float-left" style="border-radius:15px;" controls>
+                                                                    <source src="/static/${data.vid_dir}" type="video/mp4"> </source> 
+                                                                </video>
+                                                                </div>            
+                                                            </div>`
+        }else{
+            document.querySelector('.chatroom').innerHTML += `<div data-sent="false" class="chat_area">
+                                                                <img src="/static/assets/dp.png" alt="" class="chat_profile" />
+                                                                <div class="chatroom_chat">
+                                                                <span class="receive_message_sender">${data.username}</span>
+                                                                <div class="chat_content">
+                                                                    <div class="chat_message">${data.message}<br /></div>
+                                                                </div>
+                                                                <video width="252px" height="141px" class="shadow-sm float-left" style="border-radius:15px;" controls>
+                                                                    <source src="/static/${data.vid_dir}" type="video/mp4"> </source> 
+                                                                </video>
+                                                            </div>`
+        }
+
+    } else {
+        if(data.username == message_username){
+            document.querySelector('.chatroom').innerHTML += `<div data-sent="true" class="chat_area">
+                                                                <img src="/static/assets/dp.png" alt="" class="chat_profile" />
+                                                                <div class="chatroom_chat">
+                                                                <span class="receive_message_sender">${data.username}</span>
+                                                                <div class="chat_content">
+                                                                    <div class="chat_message">${data.message}<br /></div>
+                                                                </div>
+                                                            </div>`
+        }else{
+            document.querySelector('.chatroom').innerHTML += `<div data-sent="false" class="chat_area">
+                                                                <img src="/static/assets/dp.png" alt="" class="chat_profile" />
+                                                                <div class="chatroom_chat">
+                                                                <span class="receive_message_sender">${data.username}</span>
+                                                                <div class="chat_content">
+                                                                    <div class="chat_message">${data.message}<br /></div>
+                                                                </div>
+                                                            </div>`
+        }
+    }
+    
+    console.log(document.getElementById("scroll").scrollHeight)
+    document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
+}
+
+document.querySelector('#chat-message-submit').onclick = function(e){
+    const message_input = document.querySelector('#message_input');
+    const message = message_input.value;
+
+    console.log(message)
+
+    socket.send(JSON.stringify({
+        'message':message,
+        'username':message_username
+    }));
+
+    message_input.value = '';
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log(document.getElementById("scroll").scrollHeight)
+    document.getElementById("scroll").scrollTop =
+      document.getElementById("scroll").scrollHeight;
+  });
+
+  if (userclass == 'patient') {
+      console.log('patient login')
+      // video part 
+      const ws = new WebSocket(
+          'ws://'
+          + window.location.host
+          + '/ws/video/'
+          + 'wms'
+          + '/'
+      );
+      
+      ws.onmessage = function(evt) {
+          v_data = JSON.parse(evt.data);
+          $("#resImg").attr("src", v_data.message);
+          //console.log( "Received Message: " + v_data.message);
+          // ws.close();
+      };
+
+      ws.onclose = function(evt) {
+          console.log("Connection closed.");
+      };
+
+      let btnAjax = document.querySelector('.btnAjax');
+  
+      btnAjax.addEventListener('click', e => {
+          let param = {
+              'message' : inference_result,
+              'username' : message_username
+          }
+          $.ajax({
+              url: '{% url 'inference' %}',
+              type: 'POST',
+              headers: {
+                  'X-CSRFTOKEN': '{{ csrf_token }}'
+              },
+              data: JSON.stringify(param),
+              success: function(data){
+                  console.log(data);
+                  socket.send(JSON.stringify(
+                      data
+                  ));
+              },
+              error: function(){
+                  alert('NOPE');
+              }
+          });
+          document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
+        });
+  } else if (userclass == 'doctor') {
+
+      let btnAjax_Avatar = document.querySelector('.btnAjax_Avatar');
+  
+      btnAjax_Avatar.addEventListener('click', e => {
+          const message_input = document.querySelector('#message_input');
+          const message = message_input.value;
+
+          let param = {
+              'message' : message,
+              'username' : message_username
+          }
+          $.ajax({
+              url: '{% url 'slavatar' %}',
+              type: 'POST',
+              headers: {
+                  'X-CSRFTOKEN': '{{ csrf_token }}'
+              },
+              data: JSON.stringify(param),
+              success: function(data){
+                  console.log(data);
+                  socket.send(JSON.stringify(
+                      data
+                  ));
+              },
+              error: function(){
+                  alert('NOPE');
+              }
+          });
+
+          message_input.value = '';
+
+          document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
+      })
+  }
+
+    // video part 
+    const ws = new WebSocket(
         'ws://'
         + window.location.host
-        + '/ws/'
-        + id
+        + '/ws/video/'
+        + 'wms'
         + '/'
     );
-
-    socket.onopen = function(e){
-        console.log("CONNECTION ESTABLISHED");
-    }
-
-    socket.onclose = function(e){
-        console.log("CONNECTION LOST");
-    }
-
-    socket.onerror = function(e){
-        console.log("ERROR OCCURED");
-    }
-
-    socket.onmessage = function(e){
-        const data = JSON.parse(e.data);
-        if(data.username == message_username){
-            document.querySelector('#chat-body').innerHTML += `<tr>
-                                                                    <td>
-                                                                    <p class="bg-success p-2 mt-2 mr-5 shadow-sm text-white float-right rounded">${data.message}</p>
-                                                                    </td>
-                                                                </tr>`
-        }else{
-            document.querySelector('#chat-body').innerHTML += `<tr>
-                                                                    <td>
-                                                                    <p class="bg-primary p-2 mt-2 mr-5 shadow-sm text-white float-left rounded">${data.message}</p>
-                                                                    </td>
-                                                                </tr>`
-        }
-    }
-
-    document.querySelector('#chat-message-submit').onclick = function(e){
-        const message_input = document.querySelector('#message_input');
-        const message = message_input.value;
-
-        socket.send(JSON.stringify({
-            'message':message,
-            'username':message_username
-        }));
-
-        message_input.value = '';
-    }
-
-    console.log()
-
-    if (userclass == 'patient') {
-        console.log('hi')
-        // video part 
-        const ws = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/video/'
-            + 'wms'
-            + '/'
-        );
-        
-        console.log(document)
-        ws.onmessage = function(evt) {
-            v_data = JSON.parse(evt.data);
-            $("#resImg").attr("src", v_data.message);
-            //console.log( "Received Message: " + v_data.message);
-            // ws.close();
-        };
-
-        ws.onclose = function(evt) {
-            console.log("Connection closed.");
-        };
-    } 
-
-
-    // // video part 
-    // const ws = new WebSocket(
-    //     'ws://'
-    //     + window.location.host
-    //     + '/ws/video/'
-    //     + 'wms'
-    //     + '/'
-    // );
     
-    // console.log(document)
-    // ws.onmessage = function(evt) {
-    //     v_data = JSON.parse(evt.data);
-    //     $("#resImg").attr("src", v_data.message);
-    //     //console.log( "Received Message: " + v_data.message);
-    //     // ws.close();
-    // };
+    console.log(document)
+    ws.onmessage = function(evt) {
+        v_data = JSON.parse(evt.data);
+        $("#resImg").attr("src", v_data.message);
+        //console.log( "Received Message: " + v_data.message);
+        // ws.close();
+    };
 
-    // ws.onclose = function(evt) {
-    //     console.log("Connection closed.");
-    // };
-
-    // console.log(userclass)
-
-
-    // ajax for inference
-    let btnAjax = document.querySelector('.btnAjax');
-    
-    btnAjax.addEventListener('click', e => {
-        let param = {
-            'message' : inference_result,
-            'username' : message_username
-        }
-        $.ajax({
-            url: '{% url 'inference' %}',
-            type: 'POST',
-            headers: {
-                'X-CSRFTOKEN': '{{ csrf_token }}'
-            },
-            data: JSON.stringify(param),
-            success: function(data){
-                // console.log(data);
-                socket.send(JSON.stringify(
-                    data
-                ));
-            },
-            error: function(){
-                alert('NOPE');
-            }
-        });
-    })
+    ws.onclose = function(evt) {
+        console.log("Connection closed.");
+    };
 </script>
+
 {% endblock %}

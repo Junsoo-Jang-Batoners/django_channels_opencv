@@ -63,7 +63,7 @@ def extract_keypoints(results):
 
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     # filename = './[mix]P73_U19_N1.mp4'
-    filecnt = 1
+    filecnt = 201
     filename = 'inference/data/DCBA/rt_inf_' + str(filecnt) + '.inference'
     cap = cv2.VideoCapture(0)
     cnt = 0 
