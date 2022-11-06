@@ -81,11 +81,11 @@ def load_data(data_cfg: dict) -> (Dataset, Dataset, Dataset, Vocabulary, Vocabul
         for i in range(len(features)):
             for j in range(len(features[i])):
                 ft = features[i][j]
-                if ft.size(0) != 96:
-                    if ft.size(0) == 192:
-                        features[i][j] = ft[:len(ft)//2]
-                    else:
-                        print(ft.size(0))
+                # if ft.size(0) != 96:
+                #     if ft.size(0) == 192:
+                #         features[i][j] = ft[:len(ft)//2]
+                #     else:
+                #         print(ft.size(0))
         return torch.stack([torch.stack(ft, dim=0) for ft in features], dim=0)
 
     sequence_field = data.RawField()
@@ -247,11 +247,11 @@ def load_inference(data_cfg: dict) -> (Dataset, Dataset, Dataset, Vocabulary, Vo
         for i in range(len(features)):
             for j in range(len(features[i])):
                 ft = features[i][j]
-                if ft.size(0) != 96:
-                    if ft.size(0) == 192:
-                        features[i][j] = ft[:len(ft)//2]
-                    else:
-                        print(ft.size(0))
+                # if ft.size(0) != 96:
+                #     if ft.size(0) == 192:
+                #         features[i][j] = ft[:len(ft)//2]
+                #     else:
+                #         print(ft.size(0))
         return torch.stack([torch.stack(ft, dim=0) for ft in features], dim=0)
 
     sequence_field = data.RawField()

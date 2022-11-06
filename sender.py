@@ -21,13 +21,13 @@ async def send_video(websocket):
 
     # global cam
     while True:
-        time.sleep(0.1)   
+        time.sleep(10)   
         result, imgencode = cv2.imencode('.jpg', frame, encode_param)
         data = np.array(imgencode)
         img = data.tobytes()
         # base64 encoded transmission
         img = base64.b64encode(img).decode()
-        
+        print('sending!')
         await websocket.send("data:image/jpg;base64,"+ img)
 
         ret, frame = capture.read()

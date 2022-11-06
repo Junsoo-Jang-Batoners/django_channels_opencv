@@ -16,10 +16,10 @@ import pandas as pd
 mp_holistic = mp.solutions.holistic
 
 def extract_keypoints(results):
-    pose = np.array([[res.x, res.y] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(12*2)
+    pose = np.array([[res.x, res.y] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(17*2)
     lh = np.array([[res.x, res.y] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*2)
     rh = np.array([[res.x, res.y] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*2)
-    return np.concatenate([pose[22:34], lh, rh]).tolist()
+    return np.concatenate([pose[:34], lh, rh]).tolist()
 
 capture = cv2.VideoCapture(0)
 if not capture.isOpened():
@@ -73,13 +73,13 @@ async def send_video(websocket):
 
             if not results.pose_landmarks:
                 # print(f'{cnt} problem of pose')
-                keypoints[:12] = former_keypoints[:12]
+                keypoints[:34] = former_keypoints[:34]
             if not results.left_hand_landmarks:
                 # print(f'{cnt} problem of left')
-                keypoints[12:54] = former_keypoints[12:54]
+                keypoints[34:76] = former_keypoints[34:76]
             if not results.right_hand_landmarks:
                 # print(f'{cnt} problem of right')
-                keypoints[54:96] = former_keypoints[54:96]
+                keypoints[76:] = former_keypoints[76:]
 
             if flag:
                 sign.append(keypoints)

@@ -1,13 +1,13 @@
 name: sign_experiment
 data:
-    data_path: inference/data/
+    data_path: ./data/
     version: phoenix_2014_trans
     sgn: sign
     txt: text
     gls: gloss
     train: DCBA/DCBA.train
-    dev: DCBA/DCBA_inf.test
-    test: DCBA/DCBA_inf.test
+    dev: DCBA/DCBA.dev
+    test: DCBA/DCBA.test
     feature_size: 118
     level: word
     txt_lowercase: true
@@ -17,37 +17,40 @@ data:
 testing:
     recognition_beam_sizes:
     - 1
-    # - 2
-    # - 3
-    # - 4
-    # - 5
-    # - 6
-    # - 7
-    # - 8
-    # - 9
-    # - 10
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
     translation_beam_sizes:
     - 1
-    # - 2
-    # - 3
-    # - 4
-    # - 5
-    # - 6
-    # - 7
-    # - 8
-    # - 9
-    # - 10
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
     translation_beam_alphas:
     - -1
-    # - 0
-    # - 1
-    # - 2s
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
 training:
     reset_best_ckpt: false
     reset_scheduler: false
     reset_optimizer: false
     random_seed: 42
-    model_dir: "inference/dcba03"
+    model_dir: "./dcba03"
     recognition_loss_weight: 1.0
     translation_loss_weight: 1.0
     eval_metric: bleu
@@ -64,7 +67,7 @@ training:
     eval_translation_beam_alpha: -1
     overwrite: true
     shuffle: true
-    use_cuda: False
+    use_cuda: true
     translation_max_output_length: 30
     keep_last_ckpts: 1
     batch_multiplier: 1
@@ -112,8 +115,3 @@ model:
         hidden_size: 512
         ff_size: 2048
         dropout: 0.1
-inference:
-    gls_vocab: "./dcba01/gls.vocab"
-    gls_vocab_file: "./dcba01/gls.vocab"
-    txt_vocab: "./dcba01/txt.vocab"
-    txt_vocab_file: "./dcba01/txt.vocab"

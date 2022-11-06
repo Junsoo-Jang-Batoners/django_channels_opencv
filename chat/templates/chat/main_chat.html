@@ -201,15 +201,7 @@ div[data-sent="true"] > div > div > .chat_message {
   right: -100px;
 }
 
-body {
-  margin: 0 0;
-  padding: 0 0;
-  box-sizing: border-box;
-  font-family: "Noto Sans KR", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #333;
-}
+
 * {
   box-sizing: inherit;
 }
@@ -239,6 +231,11 @@ textarea {
   gap: 5px;
   padding: 10px;  
 }
+
+#canvas {
+  display: none;
+}
+
 </style>
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}" />
@@ -310,8 +307,9 @@ textarea {
         {% endfor %}
       </div>
       <div class="message-box">
-        <form class="input_form">
+        <div class="input_form">
             <input
+              type="text"
               id="message_input"
               name="text"
               placeholder="메시지를 입력하세요"
@@ -320,7 +318,7 @@ textarea {
             />
             <button class="btn btn-success" id="chat-message-submit" style="white-space: nowrap; height: 100%;">전송</button>
 
-          </form>                    
+        </div>                    
             {% if user_class == 'patient' %}
               <button class="btn btn-outline-info btnAjax" style="width:80%">수어 번역</button>
             {% elif user_class == 'doctor' %}
@@ -333,15 +331,31 @@ textarea {
                     <button class="btn btn-primary">INF</button>
                 </form> -->
             {% endif %}
-            <button class="btn btn-outline-warning btnAjax_STT" style="width:80%">음성 인식</button>
+            <button class="btn btn-outline-warning btnRecord" style="width:80%">음성 녹음</button>
+            <div>
+              <audio controls style="visibility: hidden;">녹음된 소리를 재생할 audio 엘리먼트</audio> 
+              <button class="btn btn-outline-warning btnAjax_STT" style="width:20%; visibility: hidden;">음성 인식 처리</button>  
+            </div>
+
+        
+            <!-- <button class="btn btn-outline-warning btnTest" style="width:80%">이미지테스트</button> -->
 
       
     </div>
   </div>
-
 </div>
 {% if user_class == 'patient' %}
-  <img id="resImg" src="" width="40%" style="border-radius: 20px; margin: 150px -100px"/>
+  <!-- <img id="resImg" src="" width="40%" style="border-radius: 20px; margin: 150px -100px"/> -->
+  <div>
+    <body onload="setSize()">
+      <video id="video" style="border-radius: 20px;" onload="setSize()"></video>
+      <canvas id="canvas" style="display: none;"></canvas>
+      <br>
+      <br>
+      <button id="toggleStream" onclick="toggleStream()">웹캠 실행</button>
+      <button id="slProcess" onclick="slProcessClick()" style="visibility: hidden;">수어 녹화</button>
+    </body>  
+  </div>  
 {% else %}
 {% endif %}
 
@@ -358,7 +372,7 @@ textarea {
 <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js" ></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script>
-  const id = JSON.parse(document.getElementById('json-username').textContent);
+const id = JSON.parse(document.getElementById('json-username').textContent);
 const message_username = JSON.parse(document.getElementById('json-message-username').textContent);
 const userclass = JSON.parse(document.getElementById('json-userclass').textContent);
 const inference_result = JSON.parse(document.getElementById('json-inference-result').textContent);
@@ -385,7 +399,8 @@ socket.onerror = function(e){
 
 socket.onmessage = function(e){
     const data = JSON.parse(e.data);
-    console.log(data)
+    
+    console.log("Received chat message: " + data.message + " of " + data.username);
     
     if (data.vid_dir){
         if(data.username == message_username){
@@ -438,14 +453,13 @@ socket.onmessage = function(e){
         }
     }
     
-    console.log(document.getElementById("scroll").scrollHeight)
+    // console.log(document.getElementById("scroll").scrollHeight)
     document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
 }
 
 document.querySelector('#chat-message-submit').onclick = function(e){
     const message_input = document.querySelector('#message_input');
     const message = message_input.value;
-
     console.log(message)
 
     socket.send(JSON.stringify({
@@ -456,11 +470,11 @@ document.querySelector('#chat-message-submit').onclick = function(e){
     message_input.value = '';
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    console.log(document.getElementById("scroll").scrollHeight)
-    document.getElementById("scroll").scrollTop =
-      document.getElementById("scroll").scrollHeight;
-  });
+// document.addEventListener("DOMContentLoaded", () => {
+//     console.log(document.getElementById("scroll").scrollHeight)
+//     document.getElementById("scroll").scrollTop =
+//       document.getElementById("scroll").scrollHeight;
+//   });
 
   if (userclass == 'patient') {
       console.log('patient login')
@@ -473,12 +487,92 @@ document.addEventListener("DOMContentLoaded", () => {
           + '/'
       );
       
-      ws.onmessage = function(evt) {
-          v_data = JSON.parse(evt.data);
-          $("#resImg").attr("src", v_data.message);
+      // ws.onmessage = function(evt) {
+      //     v_data = JSON.parse(evt.data);
+      //     console.log(v_data)
+      //     $("#resImg").attr("src", v_data.message);
+          // console.log(evt)
           //console.log( "Received Message: " + v_data.message);
           // ws.close();
-      };
+      // };
+
+    //   ws.send(JSON.stringify({
+    //     'message':message,
+    //     'username':message_username
+    // }));
+
+
+  // webcam
+  let width, height;
+
+  function setSize() {
+      if (window.orientation == 0) {
+          //portrait
+          width = 240; height = 320;
+      }
+      else {
+          //landscape
+          width = 320; height = 240;
+      }
+  }
+
+  const constraints = {
+      video: { facingMode: "user", }, audio: false
+  };
+  const video = document.getElementById("video");
+
+  function successCallback(stream) {
+      video.width = width; video.height = height;//prevent Opencv.js error.
+      video.srcObject = stream;
+      video.play();
+  }
+
+  function errorCallback(error) {
+      console.log(error);
+  }
+
+  let streaming = false;
+  function toggleStream() {
+      if (streaming === false) {
+          navigator.getUserMedia(constraints, successCallback, errorCallback);
+          document.getElementById('toggleStream').innerHTML = "Stop";
+          document.getElementById('slProcess').style.visibility = 'visible';
+        }
+      else {
+          const stream = video.srcObject;
+          const tracks = stream.getTracks();
+          tracks.forEach(track => {
+              track.stop();
+          });
+          document.getElementById('toggleStream').innerHTML = "Play";
+          document.getElementById('slProcess').style.visibility = 'hidden';
+        }
+      streaming = !streaming;
+  }
+
+  function slProcessClick() {
+    slProcess()
+}
+
+  function slProcess() {
+    if (streaming == true) {
+      const context = canvas.getContext("2d");
+      if (width && height) {
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(video, 0, 0, width, height);
+        const data = canvas.toDataURL("image/webp");
+        ws.send(JSON.stringify(data));        
+        setTimeout(slProcess, 33)
+    } else {
+      
+    };
+    }
+    else {
+
+    }
+  }
+      
 
       ws.onclose = function(evt) {
           console.log("Connection closed.");
@@ -499,7 +593,6 @@ document.addEventListener("DOMContentLoaded", () => {
               },
               data: JSON.stringify(param),
               success: function(data){
-                  console.log(data);
                   socket.send(JSON.stringify(
                       data
                   ));
@@ -508,7 +601,17 @@ document.addEventListener("DOMContentLoaded", () => {
                   alert('NOPE');
               }
           });
-          document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
+      let btnTest = document.querySelector('.btnTest');
+
+      btnTest.addEventListener('click', e => {
+          ws.send(
+            JSON.stringify(
+            )
+          )
+          });
+
+
+          // document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
         });
   } else if (userclass == 'doctor') {
 
@@ -530,7 +633,6 @@ document.addEventListener("DOMContentLoaded", () => {
               },
               data: JSON.stringify(param),
               success: function(data){
-                  console.log(data);
                   socket.send(JSON.stringify(
                       data
                   ));
@@ -542,30 +644,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
           message_input.value = '';
 
-          document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
+          // document.getElementById("scroll").scrollTop = document.getElementById("scroll").scrollHeight;    
       })
-  }
+  };
 
-    // video part 
-    const ws = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/video/'
-        + 'wms'
-        + '/'
-    );
+  // 음성녹음
+    // 엘리먼트 취득
+    const $audioEl = document.querySelector("audio");
+    const btnRecord = document.querySelector(".btnRecord");
     
-    console.log(document)
-    ws.onmessage = function(evt) {
-        v_data = JSON.parse(evt.data);
-        $("#resImg").attr("src", v_data.message);
-        //console.log( "Received Message: " + v_data.message);
-        // ws.close();
-    };
+    // 녹음중 상태 변수
+    let isRecording = false;
 
-    ws.onclose = function(evt) {
-        console.log("Connection closed.");
-    };
+    // MediaRecorder 변수 생성
+    let mediaRecorder = null;
+
+    // 녹음 데이터 저장 배열
+    const audioArray = [];
+
+    btnRecord.onclick = async function (event) {
+        if(!isRecording){
+
+            // 마이크 mediaStream 생성: Promise를 반환하므로 async/await 사용
+            const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true});
+
+            // MediaRecorder 생성
+            mediaRecorder = new MediaRecorder(mediaStream);
+
+            // 이벤트핸들러: 녹음 데이터 취득 처리
+            mediaRecorder.ondataavailable = (event)=>{
+                audioArray.push(event.data); // 오디오 데이터가 취득될 때마다 배열에 담아둔다.
+            }
+
+            // 이벤트핸들러: 녹음 종료 처리 & 재생하기
+            mediaRecorder.onstop = (event)=>{
+                
+                // 녹음이 종료되면, 배열에 담긴 오디오 데이터(Blob)들을 합친다: 코덱도 설정해준다.
+                const blob = new Blob(audioArray, {"type": "audio/ogg codecs=opus"});
+                audioArray.splice(0); // 기존 오디오 데이터들은 모두 비워 초기화한다.
+                
+                // Blob 데이터에 접근할 수 있는 주소를 생성한다.
+                const blobURL = window.URL.createObjectURL(blob);
+                
+                console.log(blobURL)
+
+                // audio엘리먼트로 재생한다.
+                $audioEl.src = blobURL;
+                $audioEl.play();
+
+            }
+
+            // 녹음 시작
+            mediaRecorder.start();
+            isRecording = true;
+
+        }else{
+            // 녹음 종료
+            mediaRecorder.stop();
+            isRecording = false;
+            document.querySelector("audio").style.visibility = 'visible'
+            document.querySelector(".btnAjax_STT").style.visibility = 'visible'
+
+            
+          }
+    }
 </script>
 
 {% endblock %}
